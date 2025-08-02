@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Morse Code Music Player</title>
+  <!-- Google Fonts for a professional modern look -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto:wght@400&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #222846 75%, #ffc81b 110%);
+      color: #fff;
+      font-family: 'Roboto', Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.4s;
+    }
+    h1 {
+      font-family: 'Montserrat', Arial, sans-serif;
+      font-size: 2.1em;
+      letter-spacing: 2px;
+      color: #ffc81b;
+      margin-bottom: 10px;
+      text-shadow: 0 8px 28px #191d3c70;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      user-select: none;
+    }
+    .morse-icon {
+      font-family: 'Fira Mono', monospace;
+      color: #f5cf47;
+      font-size: 1.3em;
+      letter-spacing: 0.12em;
+      animation: morseflash 0.8s steps(2, end) infinite;
+    }
+    @keyframes morseflash {
+      0%, 100% { opacity: 1; }
+      60% { opacity: 0.5; }
+    }
+    #main-container {
+      background: #262b50f8;
+      padding: 36px 28px 28px 28px;
+      border-radius: 23px;
+      box-shadow: 0 4px 26px 0 #181c3835, 0 2px 4px #10133435;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 350px;
+      min-height: 260px;
+      margin-top: 10px;
+      gap: 10px;
+      animation: fadeIn 1.2s 0.2s backwards;
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(40px);}
+      100% { opacity: 1; transform: none; }
+    }
+    .instructions {
+      color: #e1e6ff;
+      font-size: 1.04em;
+      margin-bottom: 6px;
+      margin-top: 7px;
+      text-align: center;
+      opacity: 0.82;
+      font-family: 'Roboto', Arial, sans-serif;
+    }
+    input[type="text"] {
+      width: 335px;
+      padding: 14px 18px;
+      border: 1.5px solid #353a62;
+      border-radius: 16px;
+      margin-bottom: 16px;
+      font-size: 1.13rem;
+      background: #22253d;
+      color: #fafad7;
+      outline: none;
+      transition: border 0.23s, box-shadow 0.2s, background 0.2s;
+      box-shadow: 0 1px 6px 0 #0f122170;
+      font-family: 'Roboto', Arial, sans-serif;
+      letter-spacing: 0.035em;
+    }
+    input[type="text"]:focus {
+      background: #272b52;
+      border-color: #ffc81b;
+      box-shadow: 0 2px 16px 0 #ffc81b45;
+    }
+    button {
+      padding: 11px 38px;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(98deg, #ffc81b 60%, #f5cf47 100%);
+      color: #262846;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 1.13rem;
+      box-shadow: 0 2px 18px #ffc81b2d;
+      transition: background 0.19s, box-shadow 0.2s, letter-spacing 0.15s;
+      margin-bottom: 14px;
+      outline: none;
+      font-family: 'Montserrat', Arial, sans-serif;
+      letter-spacing: 0.09em;
+    }
+    button:hover, button:focus {
+      background: linear-gradient(80deg, #ffdb63 68%, #ffedab 100%);
+      box-shadow: 0 3px 32px #ffc81b47, 0 2px 5px #181c3843;
+      letter-spacing: 0.13em;
+    }
+    #morse-output {
+      background: #191d3c;
+      color: #f9eead;
+      font-family: 'Fira Mono', 'Consolas', monospace;
+      padding: 19px 14px;
+      font-size: 1.3em;
+      border-radius: 8px;
+      min-height: 40px;
+      min-width: 240px;
+      max-width: 320px;
+      word-break: break-all;
+      box-shadow: 0 2px 12px 0 #1013342a;
+      letter-spacing: 0.1em;
+      margin-top: 10px;
+      transition: box-shadow 0.18s;
+    }
+    button.loading {
+      color: transparent !important;
+      pointer-events: none;
+      position: relative;
+      background: #e0e0e0 !important;
+    }
+    button.loading::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 30px;
+      height: 30px;
+      margin: -15px 0 0 -15px;
+      border: 4px solid #262846;
+      border-radius: 50%;
+      border-top-color: transparent;
+      animation: spin 1s linear infinite;
+      box-shadow: 0 0 5px rgba(0,0,0,0.2);
+      z-index: 100;
+    }
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    .controls {
+      width: 100%;
+      max-width: 335px;
+      margin: 10px 0;
+      background: #1c203a;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .control-group {
+      margin: 12px 0;
+    }
+
+    .control-group label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #e1e6ff;
+      font-size: 0.9em;
+      margin-bottom: 5px;
+    }
+
+    .value-display {
+      color: #ffc81b;
+      font-family: 'Fira Mono', monospace;
+      min-width: 40px;
+      text-align: right;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      margin: 10px 0;
+      -webkit-appearance: none;
+      background: transparent;
+    }
+
+    input[type="range"]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 4px;
+      background: #353a62;
+      border-radius: 2px;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 16px;
+      width: 16px;
+      border-radius: 50%;
+      background: #ffc81b;
+      cursor: pointer;
+      margin-top: -6px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      transition: all 0.2s ease;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      background: #ffdb63;
+      transform: scale(1.1);
+    }
+
+    @media (max-width: 500px) {
+      #main-container {
+        padding: 12px 3vw 18px 3vw;
+        min-width: 98vw;
+      }
+      input[type="text"], #morse-output {
+        width: 89vw;
+        max-width: 97vw;
+        min-width: 0;
+        font-size: 1em;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <h1> Morse Code Music Player </h1>
+  <div id="main-container">
+    <input type="text" id="lyrics" placeholder="Enter song lyrics here..." />
+    
+    <div class="controls">
+      <div class="control-group">
+        <label>Speed (WPM)
+          <input type="range" id="speed" min="5" max="50" value="20" />
+          <span class="value-display">20</span>
+        </label>
+      </div>
+      
+      <div class="control-group">
+        <label>Pitch (Hz)
+          <input type="range" id="pitch" min="400" max="1000" value="700" />
+          <span class="value-display">700</span>
+        </label>
+      </div>
+      
+      <div class="control-group">
+        <label>Volume
+          <input type="range" id="volume" min="0" max="100" value="50" />
+          <span class="value-display">50</span>
+        </label>
+      </div>
+    </div>
+
+    <button onclick="playMorse()">Play Morse</button>
+    <div id="morse-output"></div>
+  </div>
+  <script src="script.js"></script>
+</body>
+
+</html>
